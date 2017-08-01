@@ -1,28 +1,47 @@
 <!DOCTYPE html>
-<html lang="" class="no-js">
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Ya form</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="css/style.css">
-</head>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Ya Form</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+        <link rel="stylesheet" href="css/bootstrap.min.css">
+        <link rel="stylesheet" href="css/style.css">
+    </head>
     <body>
-        <div>
-            <form id="myForm" action="http://yandex.ru/">
-                <label for="myForm_fio">ФИО:</label>
-                <input type="text" value="" name="fio" id="myForm_fio" />
+        <div class="layout-main">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Ya Form</h3>
+                </div>
 
-                <label for="myForm_email">Email:</label>
-                <input type="text" value="" name="email" id="myForm_email" />
+                <div class="panel-body">
+                    <form id="myForm" action="http://yandex.ru/">
+                        <div class="form-group">
+                            <label for="myForm_fio">ФИО:</label>
+                            <input class="form-control" type="text" value="" name="fio" id="myForm_fio" />
+                            <p class="help-block">Поле должно содержать ровно три слова.</p>
+                        </div>
 
-                <label for="myForm_phone">Телефон:</label>
-                <input type="text" value="" name="phone" id="myForm_phone"  />
+                        <div class="form-group">
+                            <label for="myForm_email">Email:</label>
+                            <input class="form-control" type="text" value="" name="email" id="myForm_email" />
+                            <p class="help-block">Разрешены email-адреса только на следующих доменах: ya.ru, yandex.ru, yandex.ua, yandex.by, yandex.kz, yandex.com.</p>
+                        </div>
 
-                <input type="submit" value="Submit form" id="submitButton" />
+                        <div class="form-group">
+                            <label for="myForm_phone">Телефон:</label>
+                            <input class="form-control" type="text" value="" name="phone" id="myForm_phone" />
+                            <p class="help-block">Номер телефона, который начинается на +7, и имеет формат +7(999)999-99-99. Кроме того, сумма всех цифр телефона не должна превышать 30.</p>
+                        </div>
 
-                <div id="resultContainer"></div>
-            </form>
+                        <button type="submit" class="btn btn-primary" id="submitButton">Отправить форму</button>
+
+                        <div id="resultContainer" class="alert alert-success">Success</div>
+                    </form>
+                </div>
+            </div>
         </div>
+        <script src="index.js" ></script>
     </body>
 </html>
