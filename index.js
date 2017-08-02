@@ -31,10 +31,24 @@
 		resultContainer: document.getElementById(config.resultContainerId)
 	};
 
+	var Utils = {
+		addClass: function (o, c) {
+			var re = new RegExp("(^|\\s)" + c + "(\\s|$)", "g");
+
+			if (re.test(o.className)) {
+				return;
+			}
+			o.className = (o.className + " " + c).replace(/\s+/g, " ").replace(/(^ | $)/g, "");
+		},
+		removeClass: function (o, c) {
+			var re = new RegExp("(^|\\s)" + c + "(\\s|$)", "g");
+
+			o.className = o.className.replace(re, "$1").replace(/\s+/g, " ").replace(/(^ | $)/g, "");
+		}
+	};
+
 	var _formHandler = {
 		init: function () {
-			console.log('init form');
-
 			this.handler();
 		},
 		handler: function () {
@@ -52,8 +66,25 @@
 
 			console.log('request');
 		},
-		showErrors: function () {
-			console.log('showErrors');
+		showErrors: function (data) {
+			data.forEach(function (item) {
+				var element = cachedElements.form[item];
+
+				if (element) {
+					Utils.addClass(element, config.classNames.input.error);
+				}
+			});
+
+			console.log('showErrors', data);
+		},
+		removeErrors: function () {
+			for (var key in config.fields) {
+				var element = cachedElements.form[key];
+
+				if (element) {
+					Utils.removeClass(element, config.classNames.input.error);
+				}
+			}
 		},
 		validate: {
 			fio: function (value) {
@@ -72,10 +103,18 @@
 				return isValid;
 			},
 			email: function (email) {
+				var emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+				var yaEmail = /@(ya\.ru|yandex\.ru|yandex\.ua|yandex\.by|yandex\.kz|yandex\.com)$/;
 
+				if (!email.match(emailRegex) || !email.match(yaEmail)) {
+					return false;
+				}
+
+				return true;
 			},
 			phone: function (phone) {
-				
+
+				return false;
 			}
 		}
 	};
@@ -130,6 +169,8 @@
 		},
 		submit: function () {
 			_formHandler.disableSubmitButton(true);
+
+			_formHandler.removeErrors();
 
 			var validateForm = this.validate();
 			
