@@ -22,7 +22,8 @@
 				error: 'error',
 				progress: 'progress'
 			}
-		}
+		},
+		maxPhoneDigitsSum: 30
 	};
 
 	var cachedElements = {
@@ -113,8 +114,28 @@
 				return true;
 			},
 			phone: function (phone) {
+				var phoneRegex = /^\+7\(\d{3}\)\d{3}\-\d{2}\-\d{2}$/;
 
-				return false;
+				if (!phone.match(phoneRegex)) {
+					return false;
+				}
+
+				var phoneDigits = phone.replace(/\D/g, '');
+				var sum = 0;
+				var phoneDigitsString = phoneDigits.toString();
+				var phoneDigitsStringLength = phoneDigitsString.length;
+
+				for (var i = 0; i < phoneDigitsStringLength; i++) {
+					sum += Number(phoneDigitsString[i]);
+				}
+
+				if (sum > config.maxPhoneDigitsSum) {
+					console.log('sum: ', sum);
+
+					return false;
+				}
+
+				return true;
 			}
 		}
 	};
