@@ -19,6 +19,7 @@
 				error: 'error'
 			},
 			resultContainer: {
+				default: 'results',
 				success: 'success',
 				error: 'error',
 				progress: 'progress'
@@ -93,6 +94,8 @@
 			console.log('sendData', data, url);
 		},
 		showResults: function (response) {
+			cachedElements.resultContainer.className = config.classNames.resultContainer.default;
+
 			if (response.status === config.statuses.SUCCESS) {
 				cachedElements.resultContainer.innerHTML = "Success";
 
@@ -102,7 +105,7 @@
 
 				Utils.addClass(cachedElements.resultContainer, config.classNames.resultContainer.error);
 			} else if (response.status === config.statuses.PROGRESS) {
-				cachedElements.resultContainer.innerHTML = '<br />';
+				cachedElements.resultContainer.innerHTML = '&nbsp;';
 
 				Utils.addClass(cachedElements.resultContainer, config.classNames.resultContainer.progress);
 			}
