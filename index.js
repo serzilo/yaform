@@ -19,11 +19,17 @@
 				error: 'error'
 			},
 			resultContainer: {
+				success: 'success',
 				error: 'error',
 				progress: 'progress'
 			}
 		},
-		maxPhoneDigitsSum: 30
+		maxPhoneDigitsSum: 30,
+		statuses: {
+			SUCCESS: 'success',
+			ERROR: 'error',
+			PROGRESS: 'progress'
+		}
 	};
 
 	var cachedElements = {
@@ -45,6 +51,9 @@
 			var re = new RegExp("(^|\\s)" + c + "(\\s|$)", "g");
 
 			o.className = o.className.replace(re, "$1").replace(/\s+/g, " ").replace(/(^ | $)/g, "");
+		},
+		getRandomInt: function (min, max) {
+			return Math.floor(Math.random() * (max - min + 1)) + min;
 		}
 	};
 
@@ -62,10 +71,61 @@
 		disableSubmitButton: function (disabled) {
 			cachedElements.submit.disabled = disabled;
 		},
-		request: function (data) {
+		sendData: function () {
 			var data = MyForm.getData();
+			var url = cachedElements.form.action;
+			var _this = this;
 
-			console.log('request');
+			function makeRequest() {
+				_this.request(data, url).then(function(response) {
+					console.log('response: ', response);
+
+					_this.showResults(response);
+
+					if (response.status === config.statuses.PROGRESS) {
+						setTimeout(makeRequest, response.timeout);
+					}
+				});
+			}
+
+			makeRequest();
+
+			console.log('sendData', data, url);
+		},
+		showResults: function (response) {
+			if (response.status === config.statuses.SUCCESS) {
+				cachedElements.resultContainer.innerHTML = "Success";
+
+				Utils.addClass(cachedElements.resultContainer, config.classNames.resultContainer.success);
+			} else if (response.status === config.statuses.ERROR) {
+				cachedElements.resultContainer.innerHTML = response.reason;
+
+				Utils.addClass(cachedElements.resultContainer, config.classNames.resultContainer.error);
+			} else if (response.status === config.statuses.PROGRESS) {
+				cachedElements.resultContainer.innerHTML = '<br />';
+
+				Utils.addClass(cachedElements.resultContainer, config.classNames.resultContainer.progress);
+			}
+
+			if (response.status !== config.statuses.PROGRESS) {
+				_formHandler.disableSubmitButton(false);
+			}
+		},
+		request: function(data, url) {
+			var fakeUrls = ['error.json', 'progress.json', 'success.json'];
+			var _this = this;
+
+			return fetch(url, {
+				mode: "no-cors"
+			}).then( function (response) {
+				return _this.readExternalJson('https://raw.githubusercontent.com/serzilo/yaform/master/data/'+fakeUrls[Utils.getRandomInt(0 ,2)]);
+			});
+		},
+		readExternalJson: function(fileUrl) {
+			return fetch(fileUrl)
+				.then( function (response) {
+					return response.json();
+				});
 		},
 		showErrors: function (data) {
 			data.forEach(function (item) {
@@ -196,7 +256,7 @@
 			var validateForm = this.validate();
 			
 			if (validateForm.isValid === true) {
-				_formHandler.request();
+				_formHandler.sendData();
 			} else {
 				_formHandler.showErrors(validateForm.errorFields);
 
