@@ -46,6 +46,7 @@
 			if (re.test(o.className)) {
 				return;
 			}
+
 			o.className = (o.className + " " + c).replace(/\s+/g, " ").replace(/(^ | $)/g, "");
 		},
 		removeClass: function (o, c) {
@@ -212,16 +213,18 @@
 			var data = this.getData();
 
 			for (var key in data) {
-				var isValid = _formHandler.validate[config.fields[key].type](data[key]);
+				if (data.hasOwnProperty(key)) {
+					var isValid = _formHandler.validate[config.fields[key].type](data[key]);
 
-				if (isValid === false) {
-					results.isValid = false;
+					if (isValid === false) {
+						results.isValid = false;
 
-					if (!results.errorFields) {
-						results.errorFields = [];
+						if (!results.errorFields) {
+							results.errorFields = [];
+						}
+
+						results.errorFields.push(key);
 					}
-
-					results.errorFields.push(key);
 				}
 			}
 
@@ -231,9 +234,11 @@
 			var data = {};
 
 			for (var key in config.fields) {
-				var value = cachedElements.form[key].value;
+				if (config.fields.hasOwnProperty(key)) {
+					var value = cachedElements.form[key].value;
 
-				data[key] = value;
+					data[key] = value;
+				}
 			}
 
 			return data;
@@ -241,10 +246,12 @@
 		setData: function (data) {
 			if (data) {
 				for (var key in config.fields) {
-					var value = data[key];
+					if (config.fields.hasOwnProperty(key)) {
+						var value = data[key];
 
-					if (value !== undefined) {
-						cachedElements.form[key].value = value;
+						if (value !== undefined) {
+							cachedElements.form[key].value = value;
+						}
 					}
 				}
 			} else {
