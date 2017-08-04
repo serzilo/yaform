@@ -22,20 +22,22 @@
 				default: 'results',
 				success: 'success',
 				error: 'error',
-				progress: 'progress'
+				progress: 'progress',
+				fail: 'fail'
 			}
 		},
 		maxPhoneDigitsSum: 30,
 		statuses: {
 			SUCCESS: 'success',
 			ERROR: 'error',
-			PROGRESS: 'progress'
+			PROGRESS: 'progress',
+			FAIL: 'fail'
 		}
 	};
 
 	var cachedElements = {
-		form: document.getElementById(config.formId),
-		submit: document.getElementById(config.submitId),
+		form:            document.getElementById(config.formId),
+		submit:          document.getElementById(config.submitId),
 		resultContainer: document.getElementById(config.resultContainerId)
 	};
 
@@ -79,22 +81,26 @@
 			var _this = this;
 
 			function makeRequest() {
-				_this.request(data, url).then(function(response) {
-					console.log('response: ', response);
+				_this.request(data, url).then(function (response) {
+					console.log('Response: ', response);
 
-					_this.showResults(response);
+					_this.showResponse(response);
 
 					if (response.status === config.statuses.PROGRESS) {
 						setTimeout(makeRequest, response.timeout);
 					}
+				}).catch(function (response) {
+					console.log('Failed request: ', response);
+
+					_this.showResponse({ status: config.statuses.FAIL, url: url });
 				});
 			}
 
 			makeRequest();
 
-			console.log('sendData', data, url);
+			console.log('Request data: ', data);
 		},
-		showResults: function (response) {
+		showResponse: function (response) {
 			cachedElements.resultContainer.className = config.classNames.resultContainer.default;
 
 			if (response.status === config.statuses.SUCCESS) {
@@ -109,13 +115,17 @@
 				cachedElements.resultContainer.innerHTML = '&nbsp;';
 
 				Utils.addClass(cachedElements.resultContainer, config.classNames.resultContainer.progress);
+			} else if (response.status === config.statuses.FAIL) {
+				cachedElements.resultContainer.innerHTML = 'Failed to fetch data from ' + response.url;
+
+				Utils.addClass(cachedElements.resultContainer, config.classNames.resultContainer.fail);
 			}
 
 			if (response.status !== config.statuses.PROGRESS) {
 				_formHandler.disableSubmitButton(false);
 			}
 		},
-		request: function(data, url) {
+		request: function (data, url) {
 			var fakeUrls = ['error.json', 'progress.json', 'success.json'];
 			var _this = this;
 
@@ -125,13 +135,13 @@
 				return _this.readExternalJson('https://raw.githubusercontent.com/serzilo/yaform/master/data/'+fakeUrls[Utils.getRandomInt(0 ,2)]);
 			});
 		},
-		readExternalJson: function(fileUrl) {
+		readExternalJson: function (fileUrl) {
 			return fetch(fileUrl)
 				.then( function (response) {
 					return response.json();
 				});
 		},
-		showErrors: function (data) {
+		showFormErrors: function (data) {
 			data.forEach(function (item) {
 				var element = cachedElements.form[item];
 
@@ -140,14 +150,16 @@
 				}
 			});
 
-			console.log('showErrors', data);
+			console.log('Errors:', data);
 		},
-		removeErrors: function () {
+		removeFormErrors: function () {
 			for (var key in config.fields) {
-				var element = cachedElements.form[key];
+				if (config.fields.hasOwnProperty(key)) {
+					var element = cachedElements.form[key];
 
-				if (element) {
-					Utils.removeClass(element, config.classNames.input.error);
+					if (element) {
+						Utils.removeClass(element, config.classNames.input.error);
+					}
 				}
 			}
 		},
@@ -194,7 +206,7 @@
 				}
 
 				if (sum > config.maxPhoneDigitsSum) {
-					console.log('sum: ', sum);
+					console.log('Phone digits sum: ', sum);
 
 					return false;
 				}
@@ -261,14 +273,14 @@
 		submit: function () {
 			_formHandler.disableSubmitButton(true);
 
-			_formHandler.removeErrors();
+			_formHandler.removeFormErrors();
 
 			var validateForm = this.validate();
 			
 			if (validateForm.isValid === true) {
 				_formHandler.sendData();
 			} else {
-				_formHandler.showErrors(validateForm.errorFields);
+				_formHandler.showFormErrors(validateForm.errorFields);
 
 				_formHandler.disableSubmitButton(false);
 			}
