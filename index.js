@@ -19,19 +19,19 @@
 				error: 'error'
 			},
 			resultContainer: {
-				default: 'results',
-				success: 'success',
-				error: 'error',
+				default:  'results',
+				success:  'success',
+				error:    'error',
 				progress: 'progress',
-				fail: 'fail'
+				fail:     'fail'
 			}
 		},
 		maxPhoneDigitsSum: 30,
 		statuses: {
-			SUCCESS: 'success',
-			ERROR: 'error',
+			SUCCESS:  'success',
+			ERROR:    'error',
 			PROGRESS: 'progress',
-			FAIL: 'fail'
+			FAIL:     'fail'
 		}
 	};
 
@@ -43,9 +43,9 @@
 
 	var Utils = {
 		/**
-		 * Add class to DOM element
+		 * Add class to the DOM element
 		 * @param  {Object} DOM element
-		 * @param  {String} class name
+		 * @param  {String} class
 		 * @return {undefined}
 		 */
 		addClass: function (o, c) {
@@ -58,9 +58,9 @@
 			o.className = (o.className + " " + c).replace(/\s+/g, " ").replace(/(^ | $)/g, "");
 		},
 		/**
-		 * Remove class from DOM element
+		 * Remove class from the DOM element
 		 * @param  {Object} DOM element
-		 * @param  {String} class name
+		 * @param  {String} class
 		 * @return {undefined}
 		 */
 		removeClass: function (o, c) {
@@ -88,7 +88,7 @@
 			this.handler();
 		},
 		/**
-		 * Add submit handler for form
+		 * Add submit handler for the form
 		 * @return {undefined}
 		 */
 		handler: function () {
@@ -136,7 +136,7 @@
 			console.log('Request data: ', data);
 		},
 		/**
-		 * Show response from the server, added classes to the #resultContainer
+		 * Show response from the server, add class to the #resultContainer
 		 * @param  {Object} response object
 		 * @return {undefined}
 		 */
@@ -167,7 +167,7 @@
 		},
 		/**
 		 * Make request to the server
-		 * @param  {Object} form`s data
+		 * @param  {Object} form`s data (I don`t send data to the real server)
 		 * @param  {String} server`s url
 		 * @return {Promise} promise with response
 		 */
@@ -177,7 +177,7 @@
 
 			return fetch(url, {
 				mode: "no-cors"
-			}).then( function (response) {
+			}).then( function () {
 				return _this.readExternalJson('https://raw.githubusercontent.com/serzilo/yaform/master/data/'+fakeUrls[Utils.getRandomInt(0 ,2)]);
 			});
 		},
@@ -209,7 +209,7 @@
 			console.log('Errors:', data);
 		},
 		/**
-		 * Remove error classes from fields
+		 * Remove error classes from the fields
 		 * @return {undefined}
 		 */
 		removeFormErrors: function () {
@@ -298,7 +298,8 @@
 		 */
 		validate: function () {
 			var results = {
-				isValid: true
+				isValid: true,
+				errorFields: []
 			};
 
 			var data = this.getData();
@@ -309,11 +310,6 @@
 
 					if (isValid === false) {
 						results.isValid = false;
-
-						if (!results.errorFields) {
-							results.errorFields = [];
-						}
-
 						results.errorFields.push(key);
 					}
 				}
@@ -381,6 +377,7 @@
 
 	_formHandler.init();
 
+	// export MyForm to global
 	window.MyForm = MyForm;
 
 })(window, document);
