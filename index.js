@@ -42,6 +42,12 @@
 	};
 
 	var Utils = {
+		/**
+		 * Add class to DOM element
+		 * @param  {Object} DOM element
+		 * @param  {String} class name
+		 * @return {undefined}
+		 */
 		addClass: function (o, c) {
 			var re = new RegExp("(^|\\s)" + c + "(\\s|$)", "g");
 
@@ -51,20 +57,40 @@
 
 			o.className = (o.className + " " + c).replace(/\s+/g, " ").replace(/(^ | $)/g, "");
 		},
+		/**
+		 * Remove class from DOM element
+		 * @param  {Object} DOM element
+		 * @param  {String} class name
+		 * @return {undefined}
+		 */
 		removeClass: function (o, c) {
 			var re = new RegExp("(^|\\s)" + c + "(\\s|$)", "g");
 
 			o.className = o.className.replace(re, "$1").replace(/\s+/g, " ").replace(/(^ | $)/g, "");
 		},
+		/**
+		 * Get an integer number in the range
+		 * @param  {Number} minimal digit in the range
+		 * @param  {Number} maximum digit in the range
+		 * @return {Number} random digit in the range
+		 */
 		getRandomInt: function (min, max) {
 			return Math.floor(Math.random() * (max - min + 1)) + min;
 		}
 	};
 
 	var _formHandler = {
+		/**
+		 * Init method
+		 * @return {undefined}
+		 */
 		init: function () {
 			this.handler();
 		},
+		/**
+		 * Add submit handler for form
+		 * @return {undefined}
+		 */
 		handler: function () {
 			cachedElements.form.addEventListener('submit', function (e) {
 				e.preventDefault();
@@ -72,9 +98,18 @@
 				MyForm.submit();
 			});
 		},
+		/**
+		 * Disable submit button
+		 * @param  {Boolean} disabled value for submit button
+		 * @return {undefined}
+		 */
 		disableSubmitButton: function (disabled) {
 			cachedElements.submit.disabled = disabled;
 		},
+		/**
+		 * Send data from the form to the server and handle response
+		 * @return {undefined}
+		 */
 		sendData: function () {
 			var data = MyForm.getData();
 			var url = cachedElements.form.action;
@@ -100,6 +135,11 @@
 
 			console.log('Request data: ', data);
 		},
+		/**
+		 * Show response from the server, added classes to the #resultContainer
+		 * @param  {Object} response object
+		 * @return {undefined}
+		 */
 		showResponse: function (response) {
 			cachedElements.resultContainer.className = config.classNames.resultContainer.default;
 
@@ -125,6 +165,12 @@
 				_formHandler.disableSubmitButton(false);
 			}
 		},
+		/**
+		 * Make request to the server
+		 * @param  {Object} form`s data
+		 * @param  {String} server`s url
+		 * @return {Promise} promise with response
+		 */
 		request: function (data, url) {
 			var fakeUrls = ['error.json', 'progress.json', 'success.json'];
 			var _this = this;
@@ -135,12 +181,22 @@
 				return _this.readExternalJson('https://raw.githubusercontent.com/serzilo/yaform/master/data/'+fakeUrls[Utils.getRandomInt(0 ,2)]);
 			});
 		},
+		/**
+		 * Get json from the remote server
+		 * @param  {String} jsons`s url
+		 * @return {Promise} promise with response
+		 */
 		readExternalJson: function (fileUrl) {
 			return fetch(fileUrl)
 				.then( function (response) {
 					return response.json();
 				});
 		},
+		/**
+		 * Add error classes for invalid fields
+		 * @param {Array} array with invalid fields
+		 * @return {undefined}
+		 */
 		showFormErrors: function (data) {
 			data.forEach(function (item) {
 				var element = cachedElements.form[item];
@@ -152,6 +208,10 @@
 
 			console.log('Errors:', data);
 		},
+		/**
+		 * Remove error classes from fields
+		 * @return {undefined}
+		 */
 		removeFormErrors: function () {
 			for (var key in config.fields) {
 				if (config.fields.hasOwnProperty(key)) {
@@ -164,6 +224,11 @@
 			}
 		},
 		validate: {
+			/**
+			 * Validation for fio field
+			 * @param {String} field value
+			 * @return {Boolean} is field valid
+			 */
 			fio: function (value) {
 				var regex = /([а-яa-z]+)/i;
 				var data = value.trim().replace(/\s+/g, ' ').split(' ');
@@ -179,6 +244,11 @@
 
 				return isValid;
 			},
+			/**
+			 * Validation for email field
+			 * @param {String} field value
+			 * @return {Boolean} is field valid
+			 */
 			email: function (email) {
 				var emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 				var yaEmail = /@(ya\.ru|yandex\.ru|yandex\.ua|yandex\.by|yandex\.kz|yandex\.com)$/;
@@ -189,6 +259,11 @@
 
 				return true;
 			},
+			/**
+			 * Validation for phone field
+			 * @param {String} field value
+			 * @return {Boolean} is field valid
+			 */
 			phone: function (phone) {
 				var phoneRegex = /^\+7\(\d{3}\)\d{3}\-\d{2}\-\d{2}$/;
 
@@ -217,6 +292,10 @@
 	};
 
 	var MyForm = {
+		/**
+		 * Form validation
+		 * @return {Object} object with validation results
+		 */
 		validate: function () {
 			var results = {
 				isValid: true
@@ -242,6 +321,10 @@
 
 			return results;
 		},
+		/**
+		 * Get data from the form
+		 * @return {Object} with form`s data
+		 */
 		getData: function () {
 			var data = {};
 
@@ -255,6 +338,11 @@
 
 			return data;
 		},
+		/**
+		 * Set data for the form
+		 * @param {Object} object with data
+		 * @return {undefined}
+		 */
 		setData: function (data) {
 			if (data) {
 				for (var key in config.fields) {
@@ -270,6 +358,10 @@
 				console.error('setData: wrong data');
 			}
 		},
+		/**
+		 * Submit form
+		 * @return {undefined}
+		 */
 		submit: function () {
 			_formHandler.disableSubmitButton(true);
 
