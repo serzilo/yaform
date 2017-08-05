@@ -72,7 +72,7 @@
 		 * Get an integer number in the range
 		 * @param  {Number} minimal digit in the range
 		 * @param  {Number} maximum digit in the range
-		 * @return {Number} random digit in the range
+		 * @return {Number} random integer digit in the range
 		 */
 		getRandomInt: function (min, max) {
 			return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -141,25 +141,24 @@
 		 * @return {undefined}
 		 */
 		showResponse: function (response) {
-			cachedElements.resultContainer.className = config.classNames.resultContainer.default;
+			var resultContainerContent = '&nbsp;';
+			var resultContainerClassNames = config.classNames.resultContainer.default + ' ';
 
 			if (response.status === config.statuses.SUCCESS) {
-				cachedElements.resultContainer.innerHTML = "Success";
-
-				Utils.addClass(cachedElements.resultContainer, config.classNames.resultContainer.success);
+				resultContainerContent = 'Success';
+				resultContainerClassNames += config.classNames.resultContainer.success;
 			} else if (response.status === config.statuses.ERROR) {
-				cachedElements.resultContainer.innerHTML = response.reason;
-
-				Utils.addClass(cachedElements.resultContainer, config.classNames.resultContainer.error);
+				resultContainerContent = response.reason;
+				resultContainerClassNames += config.classNames.resultContainer.error;
 			} else if (response.status === config.statuses.PROGRESS) {
-				cachedElements.resultContainer.innerHTML = '&nbsp;';
-
-				Utils.addClass(cachedElements.resultContainer, config.classNames.resultContainer.progress);
+				resultContainerClassNames += config.classNames.resultContainer.progress;
 			} else if (response.status === config.statuses.FAIL) {
-				cachedElements.resultContainer.innerHTML = 'Failed to fetch data from ' + response.url;
-
-				Utils.addClass(cachedElements.resultContainer, config.classNames.resultContainer.fail);
+				resultContainerContent = 'Failed to fetch data from ' + response.url;
+				resultContainerClassNames += config.classNames.resultContainer.fail;
 			}
+
+			cachedElements.resultContainer.className = resultContainerClassNames;
+			cachedElements.resultContainer.innerHTML = resultContainerContent;
 
 			if (response.status !== config.statuses.PROGRESS) {
 				_formHandler.disableSubmitButton(false);
@@ -230,7 +229,7 @@
 			 * @return {Boolean} is field valid
 			 */
 			fio: function (value) {
-				var regex = /([а-яa-z]+)/i;
+				var regex = /(^[а-яa-z]+$)/i;
 				var data = value.trim().replace(/\s+/g, ' ').split(' ');
 				var isValid;
 
@@ -239,7 +238,7 @@
 				}
 
 				isValid = data.every(function(word) {
-					return regex.test(word.trim());
+					return regex.test(word);
 				});
 
 				return isValid;
