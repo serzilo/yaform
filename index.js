@@ -86,6 +86,7 @@
 		 */
 		init: function () {
 			this.handler();
+			this.phoneMask();
 		},
 		/**
 		 * Add submit handler for the form
@@ -97,6 +98,15 @@
 
 				MyForm.submit();
 			});
+		},
+		/**
+		 * Add mask for phone input
+		 * @return {undefined}
+		 */
+		phoneMask: function () {
+			var phoneInput = document.querySelector('input[name="' + config.fields.phone.type +'"]');
+
+			Inputmask({"mask": "+7(999)999-99-99"}).mask(phoneInput);
 		},
 		/**
 		 * Disable submit button
